@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      args:
+        USER: ${USER:-appuser}
+      context: .
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    user: ${USER:-appuser}
+    volumes:
+      - .:/app
+      - ~/.ssh:/home/${USER}/.ssh:ro
+      - ~/Developer/utils/vscode/.bashrc:/home/${USER}/.bashrc:ro
+
+  postgres:
+    environment:
+      - POSTGRES_DB=django-postgres
+      - POSTGRES_INITDB_ARGS=--no-sync
+      - POSTGRES_PASSWORD=postgres
+    image: ghcr.io/baosystems/postgis:14-3.2
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  pg_data: {}
